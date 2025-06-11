@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     usernameField.value = '';
     passwordField.value = '';
 
+    // Add event listener to close the modal or perform the cancel action
+    cancelBtn.addEventListener('click', () => {
+        const modal = document.querySelector('.modal');
+        modal.style.display = 'none'; // Hide the modal
+    });
+
     // Clear login form fields when navigating back
     window.addEventListener('pageshow', (event) => {
         if (event.persisted) { // Check if the page is loaded from cache
@@ -55,8 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Show modal for account creation
+    // Show modal for account creation and reset form fields
     createAccountBtn.addEventListener('click', () => {
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('confirm-password').value = '';
         modal.style.display = 'flex';
     });
 
