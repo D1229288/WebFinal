@@ -30,11 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove previous error messages
         document.querySelectorAll('.error-message').forEach((msg) => msg.remove());
 
-        // Validate username
-        if (!usernameField.value.trim()) {
+        /// Validate username for @ symbol
+        const username = usernameField.value.trim();
+        if (!username.includes('@')) {
             isValid = false;
             const error = document.createElement('p');
-            error.textContent = 'Username is required.';
+            error.textContent = 'Username must contain an "@" symbol.';
             error.classList.add('error-message');
             usernameField.parentElement.appendChild(error);
         }
@@ -65,16 +66,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = document.getElementById('password').value.trim();
         const confirmPassword = document.getElementById('confirm-password').value.trim();
 
-        if (email && password && confirmPassword && password === confirmPassword) {
-            modal.style.display = 'none';
-            window.location.href = 'error.html';
-        } else {
+        // Remove previous error messages
+        document.querySelectorAll('.error-message').forEach((msg) => msg.remove());
+
+        let isValid = true;
+
+        // Validate email for @ symbol
+        if (!email.includes('@')) {
+            isValid = false;
+            const error = document.createElement('p');
+            error.textContent = 'Email must contain an "@" symbol.';
+            error.classList.add('error-message');
+            document.getElementById('email').parentElement.appendChild(error);
+        }
+
+        // Validate password and confirm password
+        if (!password || !confirmPassword || password !== confirmPassword) {
+            isValid = false;
             alert('Please fill out all fields and ensure passwords match.');
         }
-    });
 
-    // Cancel button closes modal
-    cancelBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
+        if (isValid) {
+            modal.style.display = 'none';
+            window.location.href = 'error.html';
+        }
     });
 });
