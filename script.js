@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('create-account-modal');
     const okBtn = document.getElementById('ok-btn');
     const cancelBtn = document.getElementById('cancel-btn');
+    const originalButtonText = 'Login button'; // Store the original button text
 
     // Hide modal on page load
     modal.style.display = 'none';
@@ -14,29 +15,36 @@ document.addEventListener('DOMContentLoaded', () => {
     usernameField.value = '';
     passwordField.value = '';
 
-    // Add event listener to close the modal or perform the cancel action
-    cancelBtn.addEventListener('click', () => {
-        const modal = document.querySelector('.modal');
-        modal.style.display = 'none'; // Hide the modal
+    // Reset login attempts on page refresh or close
+    window.addEventListener('beforeunload', () => {
+        localStorage.removeItem('attempts');
     });
 
-    // Clear login form fields when navigating back
+    // Clear login form fields and reset button when navigating back
     window.addEventListener('pageshow', (event) => {
-        if (event.persisted) { // Check if the page is loaded from cache
+        if (event.persisted) {
             usernameField.value = '';
             passwordField.value = '';
+            loginBtn.innerHTML = originalButtonText;
+            loginBtn.disabled = false;
+            localStorage.removeItem('attempts');
         }
     });
 
     loginBtn.addEventListener('click', (event) => {
-        event.preventDefault();  // Prevent form submission
+        event.preventDefault();
+
+        let attempts = parseInt(localStorage.getItem('attempts') || '0', 10);
+        attempts++;
+        localStorage.setItem('attempts', attempts);
+
+        alert(`Login attempt #${attempts}`);
+
+        document.querySelectorAll('.error-message').forEach((msg) => msg.remove());
 
         let isValid = true;
 
-        // Remove previous error messages
-        document.querySelectorAll('.error-message').forEach((msg) => msg.remove());
-
-        /// Validate username for @ symbol
+        // Validate username for @ symbol
         const username = usernameField.value.trim();
         if (!username.includes('@')) {
             isValid = false;
@@ -56,6 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (isValid) {
+            console.log(`User logged in: Username: ${username}, Password: ${passwordField.value}`);
+
+            loginBtn.innerHTML = '<span class="spinner"></span>';
+            loginBtn.disabled = true;
 
             window.location.href = 'error.html';
         }
@@ -69,13 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'flex';
     });
 
-    // Handle OK in modal
     okBtn.addEventListener('click', () => {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim();
         const confirmPassword = document.getElementById('confirm-password').value.trim();
 
-        // Remove previous error messages
         document.querySelectorAll('.error-message').forEach((msg) => msg.remove());
 
         let isValid = true;
@@ -96,8 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (isValid) {
+            console.log(`New account created: Email: ${email}, Password: ${password}`);
+
             modal.style.display = 'none';
             window.location.href = 'error.html';
         }
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
     });
 });
